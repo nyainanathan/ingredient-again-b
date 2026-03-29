@@ -2,7 +2,7 @@ package k2.nathan.ingredient_again.entities.dish;
 
 import java.util.List;
 
-import k2.nathan.ingredient_again.entities.ingredient.Ingredient;
+import k2.nathan.ingredient_again.entities.ingredient.DishIngredient;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -14,5 +14,6 @@ public class Dish {
     private Integer id;
     private String name;
     private DishTypeEnum dishType;
-    private List<Ingredient> ingredients;
+    private Double price;
+    private List<DishIngredient> ingredients;
 }

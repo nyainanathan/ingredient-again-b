@@ -1,4 +1,4 @@
---TD1 remake
+--TD2 remake
 create type dish_type as enum ('STARTER', 'MAIN', 'DESSERT');
 
 
@@ -19,3 +19,17 @@ create table ingredient
     category ingredient_category,
     id_dish  int references dish (id)
 );
+
+
+--TD3 remake
+create type unit_type as enum('PCS', 'KG', 'L');
+
+create table DishIngredients(
+    id serial primary key ,
+    id_dish int references dish(id),
+    id_ingredient int references ingredient(id),
+    quantity_required numeric(10,2 ),
+    unit unit_type
+);
+
+alter table ingredient drop column  id_dish;
