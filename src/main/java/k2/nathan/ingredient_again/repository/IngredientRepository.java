@@ -60,4 +60,42 @@ public class IngredientRepository {
 
         return ingredients;
     }
+
+    /*
+        GET /ingredients/{id} qui retourne un objet JSON relatif à l’ingrédient
+        portant l’identifiant fourni à travers {id} et contenant les attributs : identifiant,
+        nom, catégorie de l’ingrédient et prix. Dans le cas où l’ingrédient n’est pas
+        trouvé, alors retourner une réponse HTTP contenant le code de statut 404 et
+        un message textuel disant que “Ingredient.id={id) is not found”.
+    */
+   public Ingredient findById(Integer id){
+        String query = """
+                SELECT
+                    id, name, price, category
+                FROM ingredient
+                WHERE id = ?
+                """;
+        Ingredient ingredient = new Ingredient();
+
+        try(
+            Connection conn = dataSource.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query);
+        ) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+
+            if(rs.next()){
+                ingredient.setId(rs.getInt("id"));
+                ingredient.setName(rs.getString("name"));
+                ingredient.setPrice(rs.getDouble("price"));
+                ingredient.setCategory(CategoryEnum.valueOf(rs.getString("category")));
+            }
+            
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return ingredient;
+   }
 }
