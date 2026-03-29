@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: ingredient-again
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: 
