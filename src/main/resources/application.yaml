@@ -3,4 +3,6 @@ spring:
     name: ingredient-again
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: 
+    url: jdbc:postgresql://localhost:5432/mini-dish-db
+    username: postgres
+    password: ${DB_PASS}
