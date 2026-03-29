@@ -33,3 +33,18 @@ create table DishIngredients(
 );
 
 alter table ingredient drop column  id_dish;
+
+alter table dish
+    add column if not exists price numeric(10, 2);
+
+--TD4
+create type movement_type as enum('IN', 'OUT');
+
+create table StockMovement(
+    id serial primary key,
+    id_ingredient int not null references ingredient(id),
+    quantity numeric(10,2) not null,
+    type movement_type default 'OUT',
+    unit unit_type default 'KG',
+    creation_datetime timestamp default now()
+);
