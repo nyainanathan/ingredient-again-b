@@ -1,17 +1,23 @@
 package k2.nathan.ingredient_again.controller;
 
+import java.time.Instant;
+import java.time.temporal.Temporal;
 import java.util.List;
 
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import k2.nathan.ingredient_again.entities.ingredient.Ingredient;
+import k2.nathan.ingredient_again.entities.ingredient.Unit;
 import k2.nathan.ingredient_again.errors.RessourceNotFoundException;
 import k2.nathan.ingredient_again.service.IngredientService;
+import k2.nathan.ingredient_again.service.StockService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -20,6 +26,41 @@ import lombok.RequiredArgsConstructor;
 public class IngredientController {
     
     private final IngredientService ingredientService;
+    private final StockService stockService;
+
+    @GetMapping("/{id}/stock")
+    public ResponseEntity<?> findIngredientStock(
+        @PathVariable(name = "id") Integer id,
+        @RequestParam(name = "at", required = false) Instant at,
+        @RequestParam(name = "unit", required = false) Unit unit
+    ) 
+    {
+        try{
+
+            return ResponseEntity.status(200)
+            .header("Content-Type", "application/json")
+            .body(this.stockService.findIngredientStock(id, at, unit));
+
+        } catch(RessourceNotFoundException e){
+
+            return ResponseEntity.status(404)
+            .header("Content-Type", "text/plain")
+            .body(e.getMessage());
+
+        } catch(BadRequestException e){
+
+            return ResponseEntity.status(400)
+            .header("Content-Type", "text/plain")
+            .body(e.getMessage());
+
+        } catch(Exception e){
+            
+            return ResponseEntity.status(500)
+            .header("Content-Type", "text/plain")
+            .body(e.getMessage());
+            
+        }
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findOne(@PathVariable(name = "id") Integer id){
@@ -57,6 +98,5 @@ public class IngredientController {
                 .body(e.getMessage());
         }
     }
-
     
 }
