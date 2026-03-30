@@ -15,6 +15,7 @@ import k2.nathan.ingredient_again.entities.dish.Dish;
 import k2.nathan.ingredient_again.entities.dish.DishTypeEnum;
 import k2.nathan.ingredient_again.entities.ingredient.CategoryEnum;
 import k2.nathan.ingredient_again.entities.ingredient.Ingredient;
+import k2.nathan.ingredient_again.entities.ingredient.Unit;
 import lombok.RequiredArgsConstructor;
 
 @Repository
@@ -54,6 +55,41 @@ public class DishRepository {
         }
         return dishes;
     }
+    
+    public Dish findById(Integer id) {
+        Dish dish = null;
+
+        String query = """
+                        select dish.id as dish_id, dish.name as dish_name, dish_type, dish.price as dish_price
+                        from dish
+                        where dish.id = ?
+                        """;
+
+        try (
+            Connection connection = dataSource.getConnection();
+        ) {
+
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                Dish theDish = new Dish();
+                theDish.setId(resultSet.getInt("dish_id"));
+                theDish.setName(resultSet.getString("dish_name"));
+                theDish.setDishType(DishTypeEnum.valueOf(resultSet.getString("dish_type")));
+                theDish.setPrice(resultSet.getObject("dish_price") == null
+                        ? null : resultSet.getDouble("dish_price"));
+                theDish.setIngredients(findDishIngredientByDishId(theDish.getId()));
+
+                dish=theDish;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return dish;
+    }
 
     private List<Ingredient> findDishIngredientByDishId(Integer idDish) {
         String query =  """
@@ -91,4 +127,52 @@ public class DishRepository {
         }
         return ingredients;
     }
+    
+    public void detachIngredient(Integer dishId, Integer ingredientId){
+        String query = """
+                DELETE FROM dishingredients 
+                WHERE id_dish = ?
+                AND id_ingredient = ?
+                """;
+        
+        try(
+            Connection conn = dataSource.getConnection();
+            PreparedStatement ps = conn.prepareStatement(query)
+        ) {
+
+            ps.setInt(1, dishId);
+            ps.setInt(2, ingredientId);
+
+            ps.execute();
+
+        } catch(SQLException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void attach(Integer dishId, Integer ingredientId){
+        String query = """
+                INSERT INTO dishingredients 
+                (id_dish, id_ingredient, quantity_required, unit)
+                VALUES (? , ?, ? , ?::unit_type)
+                """;
+        
+        try(
+            Connection conn = dataSource.getConnection();
+            PreparedStatement ps = conn.prepareStatement(query)
+        ) {
+
+            ps.setInt(1, dishId);
+            ps.setInt(2, ingredientId);
+            ps.setDouble(3, 1);
+            ps.setString(4, Unit.KG.toString());
+
+            ps.execute();
+
+        } catch(SQLException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+
 }
