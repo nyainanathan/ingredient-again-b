@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: "{{url}}/ingredients/2/stock?at=2024-01-05T12:00:00Z&unit=KG"
+  url: "{{url}}/ingredients/20/stock?at=2024-01-05T12:00:00Z"
   params:
     - name: at
       value: 2024-01-05T12:00:00Z
@@ -13,6 +13,7 @@ http:
     - name: unit
       value: KG
       type: query
+      disabled: true
   auth: inherit
 
 settings:
