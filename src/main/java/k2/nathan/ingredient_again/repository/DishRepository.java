@@ -91,7 +91,7 @@ public class DishRepository {
         return dish;
     }
 
-    private List<Ingredient> findDishIngredientByDishId(Integer idDish) {
+    public List<Ingredient> findDishIngredientByDishId(Integer idDish) {
         String query =  """
                         SELECT i.id as ingredient_id,
                                i.name as ingredient_name,
@@ -109,6 +109,45 @@ public class DishRepository {
         ) {
 
             ps.setInt(1, idDish);
+
+            ResultSet rs =  ps.executeQuery();
+
+            while(rs.next()) {
+                    Ingredient ingre = new Ingredient(
+                            rs.getInt("ingredient_id"),
+                            rs.getString("ingredient_name"),
+                            rs.getDouble("ingredient_price"),
+                            CategoryEnum.valueOf(rs.getString("ingredient_category"))
+                    );
+
+                    ingredients.add(ingre);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return ingredients;
+    }
+
+    public List<Ingredient> findDishIngredientByDishIdAndIngredientName(Integer idDish, String ingredientName) {
+        String query =  """
+                        SELECT i.id as ingredient_id,
+                               i.name as ingredient_name,
+                               i.price as ingredient_price,
+                               i.category as ingredient_category
+                        FROM ingredient i
+                        JOIN dishingredients di ON i.id = di.id_ingredient
+                        JOIN dish d ON d.id = di.id_dish
+                        WHERE di.id_dish = ?
+                        AND i.name ilike ?
+                        """;
+        List<Ingredient> ingredients = new ArrayList<>();
+        try(
+            Connection connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(query);
+        ) {
+
+            ps.setInt(1, idDish);
+            ps.setString(2, "%"  + ingredientName + "%");
 
             ResultSet rs =  ps.executeQuery();
 

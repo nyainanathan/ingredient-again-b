@@ -5,7 +5,12 @@ info:
 
 http:
   method: PUT
-  url: "{{url}}/1/ingredients"
+  url: "{{url}}/dishes/10/ingredients"
+  body:
+    type: json
+    data: |-
+      [
+      ]
   auth: inherit
 
 settings:

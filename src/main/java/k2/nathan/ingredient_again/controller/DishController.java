@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import k2.nathan.ingredient_again.entities.ingredient.Ingredient;
@@ -22,6 +23,30 @@ import lombok.RequiredArgsConstructor;
 public class DishController {
     
     private final DishService dishService;
+
+    @GetMapping("/{id}/ingredients")
+    public ResponseEntity <?> findByIngredientsByDishIdAndPriceAndName (
+        @PathVariable(name = "id") Integer dishId,
+        @RequestParam(name = "ingredientName", required = false) String name,
+        @RequestParam(name = "ingredientPriceAround", required = false) Double priceAround
+    ) {
+        try {
+            return ResponseEntity
+            .status(200)
+            .header("Content-Type", "application/json")
+            .body(this.dishService.findByNameAndPrice(dishId, name, priceAround));
+        }catch (RessourceNotFoundException e){
+            return ResponseEntity
+                    .status(404)
+                    .header("Content-Type", "text/plain")
+                    .body(e.getMessage());
+        }
+         catch (Exception e) {
+            return ResponseEntity.status(500)
+            .header("Content-Type", "text/plain")
+            .body(e.getMessage());
+        }
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable(name = "id") Integer id){

@@ -1,5 +1,6 @@
 package k2.nathan.ingredient_again.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.coyote.BadRequestException;
@@ -29,6 +30,20 @@ public class DishService {
             throw new RessourceNotFoundException("Dish.id={"+dishId+"} is not found");
         }
         return dish;
+    }
+
+    public List<Ingredient> findByNameAndPrice(Integer dishId, String ingredientName, Double price){
+
+        //Throws an exception if the if dish is not found
+        this.findById(dishId);
+
+        List<Ingredient> ingredients = ingredientName != null ? 
+        this.dishRepository.findDishIngredientByDishIdAndIngredientName(dishId, ingredientName)
+        : this.dishRepository.findDishIngredientByDishId(dishId);
+
+        return price != null ? ingredients.stream()
+                                .filter(i -> Math.abs(i.getPrice() - price) <= 50).toList()
+                            : ingredients ;
     }
 
     public Dish attachAndDetach(Integer dishId, List<Ingredient> ingredients) throws BadRequestException{

@@ -30,3 +30,13 @@ SELECT setval('dishingredients_id_seq', (SELECT COALESCE(MAX(id), 0) FROM dishin
 
 
 SELECT pg_get_serial_sequence('dishingredients', 'id')
+
+SELECT i.id as ingredient_id,
+                               i.name as ingredient_name,
+                               i.price as ingredient_price,
+                               i.category as ingredient_category
+                        FROM ingredient i
+                        JOIN dishingredients di ON i.id = di.id_ingredient
+                        JOIN dish d ON d.id = di.id_dish
+                        WHERE di.id_dish = 1
+                        AND i.name ilike '%%'
