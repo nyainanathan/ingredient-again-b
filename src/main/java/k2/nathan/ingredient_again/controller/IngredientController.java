@@ -27,6 +27,7 @@ public class IngredientController {
     private final IngredientService ingredientService;
     private final StockService stockService;
 
+    // TODO: In the entity!!
     @GetMapping("/{id}/stock")
     public ResponseEntity<?> findIngredientStock(
         @PathVariable(name = "id") Integer id,
@@ -81,7 +82,7 @@ public class IngredientController {
         }
     }
 
-    @GetMapping("")
+    @GetMapping("") 
     public ResponseEntity<?> findAll(){
         try {
             List<Ingredient> ingredients = this.ingredientService.findAll();
